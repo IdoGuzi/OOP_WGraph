@@ -4,12 +4,12 @@ import ex1.node_info;
 import ex1.weighted_graph;
 import util.Pair;
 
-import java.util.Collection;
-import java.util.HashMap;
+import java.util.*;
 
 public class WGraph_DS implements weighted_graph{
     private HashMap<Integer, node_info> nodes;
-    private HashMap<Pair<Integer>, Double> edges;
+    private HashMap<Integer,HashMap<Integer,Double>> edges;
+    private HashMap<Pair<Integer>, Double> Edges;
     private int nodeCount, edgeCount, modeCount;
 
     public WGraph_DS(){
@@ -40,9 +40,11 @@ public class WGraph_DS implements weighted_graph{
      */
     @Override
     public boolean hasEdge(int node1, int node2) {
-        Pair<Integer> p = new Pair<>(node1,node2);
-        if (edges.get(p)>=0) return true;
-        return false;
+        HashMap<Integer,Double> nei = edges.get(node1);
+        if (nei==null) return false;
+        Double w = nei.get(node2);
+        if (w==null) return false;
+        return true;
     }
 
     /**
@@ -54,9 +56,8 @@ public class WGraph_DS implements weighted_graph{
      */
     @Override
     public double getEdge(int node1, int node2) {
-        Pair<Integer> p = new Pair<>(node1,node2);
-        Double w = edges.get(p);
-        if (w==null) w = edges.get(p.swap());
+        if (!hasEdge(node1, node2)) return -1;
+        Double w = edges.get(node1).get(node2);
         if (w==null) return -1;
         return w;
     }
@@ -69,7 +70,10 @@ public class WGraph_DS implements weighted_graph{
      */
     @Override
     public void addNode(int key) {
-
+        nodes.putIfAbsent(key,new NodeInfo(key));
+        edges.put(key,new HashMap<>());
+        nodeCount++;
+        modeCount++;
     }
 
     /**
@@ -82,7 +86,12 @@ public class WGraph_DS implements weighted_graph{
      */
     @Override
     public void connect(int node1, int node2, double w) {
-
+        if (nodes.get(node1)==null || nodes.get(node2)==null) return;
+        if (w<0) throw new IllegalArgumentException("Error: weight should be bigger or equal than 0");
+        edges.get(node1).put(node2,w);
+        edges.get(node2).put(node1,w);
+        edgeCount++;
+        modeCount++;
     }
 
     /**
@@ -93,7 +102,7 @@ public class WGraph_DS implements weighted_graph{
      */
     @Override
     public Collection<node_info> getV() {
-        return null;
+        return nodes.values();
     }
 
     /**
@@ -105,7 +114,12 @@ public class WGraph_DS implements weighted_graph{
      */
     @Override
     public Collection<node_info> getV(int node_id) {
-        return null;
+        Collection<node_info> nei = new ArrayList<>();
+        Iterator<Integer> it = edges.get(node_id).keySet().iterator();
+        while (it.hasNext()){
+            nei.add(nodes.get(it.next()));
+        }
+        return nei;
     }
 
     /**
@@ -116,7 +130,17 @@ public class WGraph_DS implements weighted_graph{
      */
     @Override
     public node_info removeNode(int key) {
-        return null;
+        node_info n = nodes.get(key);
+        if (n==null) return null;
+        Iterator<Integer> it = edges.get(key).keySet().iterator();
+        while (it.hasNext()){
+            edges.get(it.next()).remove(key);
+            edgeCount--;
+        }
+        nodes.remove(key);
+        nodeCount--;
+        modeCount++;
+        return n;
     }
 
     /**
@@ -126,7 +150,12 @@ public class WGraph_DS implements weighted_graph{
      */
     @Override
     public void removeEdge(int node1, int node2) {
-
+        node_info n1 = nodes.get(node1), n2 = nodes.get(node2);
+        if (n1==null || n2==null) return;
+        edges.get(node1).remove(node2);
+        edges.get(node2).remove(node1);
+        edgeCount--;
+        modeCount++;
     }
 
     /**
@@ -135,7 +164,7 @@ public class WGraph_DS implements weighted_graph{
      */
     @Override
     public int nodeSize() {
-        return 0;
+        return nodeCount;
     }
 
     /**
@@ -144,7 +173,7 @@ public class WGraph_DS implements weighted_graph{
      */
     @Override
     public int edgeSize() {
-        return 0;
+        return edgeCount;
     }
 
     /**
@@ -155,6 +184,6 @@ public class WGraph_DS implements weighted_graph{
      */
     @Override
     public int getMC() {
-        return 0;
+        return modeCount;
     }
 }
