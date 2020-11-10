@@ -2,14 +2,12 @@ package classes;
 
 import ex1.node_info;
 import ex1.weighted_graph;
-import util.Pair;
 
 import java.util.*;
 
 public class WGraph_DS implements weighted_graph{
     private HashMap<Integer, node_info> nodes;
     private HashMap<Integer,HashMap<Integer,Double>> edges;
-    private HashMap<Pair<Integer>, Double> Edges;
     private int nodeCount, edgeCount, modeCount;
 
     public WGraph_DS(){
@@ -40,6 +38,8 @@ public class WGraph_DS implements weighted_graph{
      */
     @Override
     public boolean hasEdge(int node1, int node2) {
+        if (nodes.get(node1)==null || nodes.get(node2)==null) return false;
+        if (node1==node2) return true;
         HashMap<Integer,Double> nei = edges.get(node1);
         if (nei==null) return false;
         Double w = nei.get(node2);
@@ -57,6 +57,7 @@ public class WGraph_DS implements weighted_graph{
     @Override
     public double getEdge(int node1, int node2) {
         if (!hasEdge(node1, node2)) return -1;
+        if (node1==node2) return 0;
         Double w = edges.get(node1).get(node2);
         if (w==null) return -1;
         return w;
@@ -114,6 +115,7 @@ public class WGraph_DS implements weighted_graph{
      */
     @Override
     public Collection<node_info> getV(int node_id) {
+        if (getNode(node_id)==null) return null;
         Collection<node_info> nei = new ArrayList<>();
         Iterator<Integer> it = edges.get(node_id).keySet().iterator();
         while (it.hasNext()){
@@ -132,11 +134,11 @@ public class WGraph_DS implements weighted_graph{
     public node_info removeNode(int key) {
         node_info n = nodes.get(key);
         if (n==null) return null;
-        Iterator<Integer> it = edges.get(key).keySet().iterator();
+        Iterator<node_info> it = getV(key).iterator();
         while (it.hasNext()){
-            edges.get(it.next()).remove(key);
-            edgeCount--;
+            removeEdge(key,it.next().getKey());
         }
+        edges.remove(key);
         nodes.remove(key);
         nodeCount--;
         modeCount++;
@@ -185,5 +187,70 @@ public class WGraph_DS implements weighted_graph{
     @Override
     public int getMC() {
         return modeCount;
+    }
+
+
+
+
+    /**
+     * This class is an implementation of the interface node_info.
+     * representing a vertex of a graph.
+     */
+    private class NodeInfo implements node_info {
+        private int key;
+        private double tag;
+        private String info;
+
+
+        public NodeInfo(int k){
+            key=k;
+            tag=0;
+            info="";
+        }
+
+        /**
+         * return the key (ID) associated with this node.
+         * @return the key of the node.
+         */
+        @Override
+        public int getKey() {
+            return key;
+        }
+
+        /**
+         * return information about the node.
+         * @return a string containing information about this node.
+         */
+        @Override
+        public String getInfo() {
+            return info;
+        }
+
+        /**
+         * Change the current information of this node to string (s).
+         * @param s the new information of the node.
+         */
+        @Override
+        public void setInfo(String s) {
+            info=s;
+        }
+
+        /**
+         * return data that was saved for any reason.
+         * @return a real number containing as tag.
+         */
+        @Override
+        public double getTag() {
+            return tag;
+        }
+
+        /**
+         * set a real number as temporal data that can be used for any reason.
+         * @param t - the new value of the tag
+         */
+        @Override
+        public void setTag(double t) {
+            tag=t;
+        }
     }
 }
