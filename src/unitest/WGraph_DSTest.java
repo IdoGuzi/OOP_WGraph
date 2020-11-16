@@ -1,6 +1,6 @@
 package unitest;
 
-import classes.WGraph_DS;
+import ex1.WGraph_DS;
 import ex1.node_info;
 import ex1.weighted_graph;
 import org.junit.jupiter.api.Test;

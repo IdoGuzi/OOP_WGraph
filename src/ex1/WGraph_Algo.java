@@ -1,9 +1,6 @@
-package classes;
+package ex1;
 
 
-import ex1.node_info;
-import ex1.weighted_graph;
-import ex1.weighted_graph_algorithms;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
