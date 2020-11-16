@@ -5,6 +5,11 @@ import ex1.weighted_graph;
 
 import java.util.*;
 
+/**
+ * This class is an implementation of the weighted_graph interface.
+ * representing a undirectional weighted graph.
+ * This class support a large number of nodes, with efficient and compact representation.
+ */
 public class WGraph_DS implements weighted_graph{
     private HashMap<Integer, node_info> nodes;
     private HashMap<Integer,HashMap<Integer,Double>> edges;
@@ -16,6 +21,32 @@ public class WGraph_DS implements weighted_graph{
         nodeCount = 0;
         edgeCount = 0;
         modeCount = 0;
+    }
+
+    /**
+     * deep copy constructor.
+     * @param g - the graph to copy.
+     */
+    public WGraph_DS(weighted_graph g){
+        nodes = new HashMap<>();
+        edges = new HashMap<>();
+        nodeCount = 0;
+        edgeCount = 0;
+        Iterator<node_info> itr = g.getV().iterator();
+        while (itr.hasNext()){
+            addNode(itr.next().getKey());
+        }
+        itr = g.getV().iterator();
+        while (itr.hasNext()){
+            node_info n = itr.next();
+            Iterator<node_info> itr2 = g.getV(n.getKey()).iterator();
+            while (itr2.hasNext()){
+                node_info v = itr2.next();
+                connect(n.getKey(),v.getKey(),g.getEdge(n.getKey(),v.getKey()));
+            }
+
+        }
+        modeCount=g.getMC();
     }
 
 
@@ -87,6 +118,7 @@ public class WGraph_DS implements weighted_graph{
      */
     @Override
     public void connect(int node1, int node2, double w) {
+        if (hasEdge(node1,node2)) return;
         if (nodes.get(node1)==null || nodes.get(node2)==null) return;
         if (w<0) throw new IllegalArgumentException("Error: weight should be bigger or equal than 0");
         edges.get(node1).put(node2,w);

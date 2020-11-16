@@ -4,11 +4,12 @@ import classes.WGraph_DS;
 import ex1.node_info;
 import ex1.weighted_graph;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -19,6 +20,31 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class WGraph_DSTest {
     Random rand = new Random();
+
+
+    @Test
+    @Timeout(value = 10,unit = TimeUnit.SECONDS)
+    void graphBuilder(){
+        int nodes = 1000000;
+        int edges = 1000000;
+        weighted_graph g = new WGraph_DS();
+        for (int i=0;i<nodes;i++){
+            g.addNode(i);
+            System.out.println(i);
+        }
+        while (g.edgeSize()<edges){
+            int a = random(0,nodes);
+            int b = random(0,nodes);
+            double w = rand.nextDouble()*10;
+            if (a==b || g.hasEdge(a,b)) continue;
+            g.connect(a,b,w);
+
+        }
+        assertEquals(true,g.nodeSize()>999999);
+        assertEquals(true,g.edgeSize()>999999);
+
+
+    }
 
 
     /**
@@ -195,10 +221,15 @@ class WGraph_DSTest {
 
     @Test
     void edgeSize() {
-        int n=random(100,300);
-        for (int i=0;i<n;i++) {
-            weighted_graph g = factory(i, i);
-            assertEquals(i,g.edgeSize());
+        int n=random(100,300), counter=0;
+        weighted_graph g = factory(n, 0);
+        while (g.edgeSize()<n){
+            int a = random(0,n);
+            int b = random(0,n);
+            if (g.hasEdge(a,b)) continue;
+            double w = rand.nextDouble()*10;
+            g.connect(a,b,w);
+            assertEquals(++counter,g.edgeSize());
         }
     }
 
