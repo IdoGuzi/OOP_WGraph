@@ -32,6 +32,7 @@ public class WGraph_DS implements weighted_graph{
         edges = new HashMap<>();
         nodeCount = 0;
         edgeCount = 0;
+        modeCount = 0;
         Iterator<node_info> itr = g.getV().iterator();
         while (itr.hasNext()){
             addNode(itr.next().getKey());
@@ -46,7 +47,6 @@ public class WGraph_DS implements weighted_graph{
             }
 
         }
-        modeCount=g.getMC();
     }
 
 
@@ -102,7 +102,7 @@ public class WGraph_DS implements weighted_graph{
      */
     @Override
     public void addNode(int key) {
-        nodes.putIfAbsent(key,new NodeInfo(key));
+        if(nodes.putIfAbsent(key,new NodeInfo(key))!=null) return;
         edges.put(key,new HashMap<>());
         nodeCount++;
         modeCount++;
