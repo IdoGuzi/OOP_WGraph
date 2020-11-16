@@ -219,7 +219,27 @@ public class WGraph_DS implements weighted_graph{
         return modeCount;
     }
 
-
+    @Override
+    public boolean equals(Object o){
+        if (o==null) return false;
+        if (!(o instanceof WGraph_DS)) return false;
+        weighted_graph g = (WGraph_DS)o;
+        if (nodeSize()!=g.nodeSize()) return false;
+        if (edgeSize()!=g.edgeSize()) return false;
+        Iterator<node_info> itr = getV().iterator();
+        while (itr.hasNext()){
+            node_info n = itr.next();
+            if (g.getNode(n.getKey())==null) return false;
+            Iterator<node_info> itr2 = getV(n.getKey()).iterator();
+            while (itr2.hasNext()){
+                node_info v = itr2.next();
+                if (g.getNode(v.getKey())==null) return false;
+                if (!g.hasEdge(n.getKey(),v.getKey())) return false;
+                if (getEdge(n.getKey(),v.getKey())!=g.getEdge(n.getKey(),v.getKey())) return false;
+            }
+        }
+        return true;
+    }
 
 
     /**
